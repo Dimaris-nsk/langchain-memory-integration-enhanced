@@ -1,0 +1,27 @@
+# Example configuration for migrating from PostgreSQL to UnifiedCheckpointer
+source_type: postgresql
+source_config:
+  connection_string: "postgresql://user:password@localhost:5432/langchain_db"
+
+destination_type: unified
+destination_config:
+  url: "http://localhost:6333"
+  collection: "migrated_checkpoints"
+
+# Optional settings
+batch_size: 500
+dry_run: false
+progress_interval: 100
+
+# Filters (optional)
+filters:
+  # Only migrate specific threads
+  # thread_id: "session-123"
+  
+  # Date range filter
+  # date_from: "2025-01-01T00:00:00"
+  # date_to: "2025-07-24T00:00:00"
+
+# Transformers (optional)
+transformers:
+  - add_metadata  # Add migration timestamp to metadata

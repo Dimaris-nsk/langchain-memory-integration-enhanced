@@ -1,0 +1,25 @@
+# Example configuration for exporting from UnifiedCheckpointer to JSON
+source_type: unified
+source_config:
+  url: "http://localhost:6333"
+  collection: "checkpoints"
+
+destination_type: json
+destination_config:
+  output_path: "/path/to/export/checkpoints.json"
+  options:
+    pretty_print: true
+    include_embeddings: false  # Exclude embeddings to reduce file size
+
+# Export settings
+batch_size: 1000
+dry_run: false
+progress_interval: 500
+
+# Filters to export only specific data
+filters:
+  # Export only recent data
+  # date_from: "2025-07-01T00:00:00"
+  
+  # Export specific threads
+  # thread_ids: ["session-1", "session-2", "session-3"]
