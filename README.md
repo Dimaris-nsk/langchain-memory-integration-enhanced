@@ -1,212 +1,398 @@
-# LangChain Memory Integration Enhanced
+# 🚀 Langgraph + Qdrant Memory Agent MCP Server
 
-[![Python Version](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Code Quality](https://img.shields.io/badge/code%20quality-SonarQube-green.svg)](http://localhost:9000)
-[![Test Coverage](https://img.shields.io/badge/coverage-80%25+-brightgreen.svg)](https://github.com/Dimaris-nsk/langchain-memory-integration-enhanced)
+> **A production-ready memory management system with semantic search and conversation history**
 
-A high-quality, production-ready memory management system for LangChain applications with automatic memory persistence, resilience patterns, and clean architecture implementation.
-
-## 🌟 Features
-
-- **4 Memory Types** - Drop-in replacements for LangChain memory classes:
-  - `UnifiedConversationBufferMemory` - Full conversation history with automatic persistence
-  - `UnifiedConversationSummaryMemory` - Compressed summaries for long conversations
-  - `UnifiedEntityMemory` - Entity extraction and relationship tracking
-  - `UnifiedKnowledgeGraphMemory` - Graph-based memory with semantic connections
-
-- **Automatic Memory Management**:
-  - Auto-saves conversation context without manual intervention
-  - Intelligent memory routing based on content type
-  - Configurable retention policies and cleanup strategies
-
-- **Resilience & Reliability**:
-  - Circuit breaker pattern for fault tolerance
-  - Graceful degradation when services unavailable
-  - Retry mechanisms with exponential backoff
-  - Health checks and monitoring
-
-- **Clean Architecture**:
-  - Hexagonal architecture with clear boundaries
-  - Dependency injection for testability
-  - Interface-based design for extensibility
-  - Full type hints and documentation
-
-## 🏗️ Architecture
-
-The project follows Clean Architecture principles with clear separation of concerns:
-
-```
-├── implementation/
-│   ├── core/               # Core business logic
-│   │   ├── interfaces/     # Abstract interfaces
-│   │   ├── entities/       # Domain entities
-│   │   └── use_cases/      # Business use cases
-│   ├── adapters/           # External adapters
-│   │   ├── qdrant/         # Qdrant vector store
-│   │   └── openai/         # OpenAI embeddings
-│   ├── unified_checkpointer/  # Memory persistence
-│   ├── resilience/         # Fault tolerance patterns
-│   └── compatibility/      # LangChain compatibility layer
-├── tests/                  # Comprehensive test suite
-└── docs/                   # Documentation
-```
-
-## 📋 Requirements
-
-- Python 3.9+
-- Qdrant (local or cloud)
-- OpenAI API key (for embeddings)
-- Optional: LangGraph for advanced orchestration
-
-## 🚀 Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/Dimaris-nsk/langchain-memory-integration-enhanced.git
-cd langchain-memory-integration-enhanced
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Install development dependencies
-pip install -r requirements-dev.txt
-```
-
-## 💻 Quick Start
-
-### Basic Usage
-
-```python
-from langchain_memory_enhanced import UnifiedConversationBufferMemory
-from langchain.chains import ConversationChain
-from langchain.llms import OpenAI
-
-# Initialize memory with automatic persistence
-memory = UnifiedConversationBufferMemory(
-    collection_name="my_conversations",
-    qdrant_url="http://localhost:6333"
-)
-
-# Use with LangChain as usual
-llm = OpenAI(temperature=0)
-conversation = ConversationChain(
-    llm=llm,
-    memory=memory,
-    verbose=True
-)
-
-# Memory is automatically saved after each interaction
-response = conversation.predict(input="Hi there!")
-```
-
-### Advanced Configuration
-
-```python
-from langchain_memory_enhanced import UnifiedMemoryConfig, UnifiedConversationSummaryMemory
-
-config = UnifiedMemoryConfig(
-    qdrant_url="http://localhost:6333",
-    collection_name="production_memory",
-    embedding_model="text-embedding-3-small",
-    max_memory_size=1000,
-    cleanup_strategy="sliding_window",
-    enable_monitoring=True,
-    circuit_breaker_threshold=5,
-    retry_attempts=3
-)
-
-memory = UnifiedConversationSummaryMemory(config=config)
-```
-
-## 📖 Documentation
-
-- [Architecture Overview](docs/ARCHITECTURE.md) - System design and patterns
-- [API Reference](docs/API_REFERENCE.md) - Complete API documentation
-- [Deployment Guide](docs/DEPLOYMENT.md) - Production deployment instructions
-- [Migration Guide](migration_tools/README.md) - Migrating from other memory systems
-
-## 🧪 Testing
-
-The project maintains >80% test coverage with comprehensive unit and integration tests:
-
-```bash
-# Run all tests
-pytest
-
-# Run with coverage
-pytest --cov=implementation --cov-report=html
-
-# Run specific test suite
-pytest tests/test_unified_checkpointer.py
-```
-
-## 🛠️ Development
-
-### Code Quality
-
-We use several tools to maintain high code quality:
-
-```bash
-# Run linting
-ruff check implementation/
-
-# Format code
-ruff format implementation/
-
-# Type checking
-mypy implementation/
-
-# SonarQube analysis
-sonar-scanner
-```
-
-### Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and development process.
-
-## 🔧 MCP Server Integration
-
-This project can be used as an MCP (Model Context Protocol) server for enhanced memory capabilities in AI applications:
-
-```python
-from langchain_memory_mcp import MemoryMCPServer
-
-server = MemoryMCPServer(
-    memory_types=["buffer", "summary", "entity", "knowledge_graph"],
-    auto_save=True
-)
-server.start()
-```
-
-## 📊 Performance
-
-- **Latency**: <50ms for memory operations
-- **Throughput**: 1000+ operations/second
-- **Memory efficiency**: Automatic cleanup and compression
-- **Scalability**: Horizontal scaling with Qdrant cluster
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- LangChain team for the excellent framework
-- Qdrant team for the vector database
-- LangGraph for orchestration capabilities
-- All contributors who helped improve this project
+[![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![Langgraph](https://img.shields.io/badge/langgraph-latest-green.svg)](https://github.com/langchain-ai/langgraph)
+[![Qdrant](https://img.shields.io/badge/qdrant-vector_db-purple.svg)](https://qdrant.tech/)
+[![MCP](https://img.shields.io/badge/MCP-server-orange.svg)](https://modelcontextprotocol.io/)
 
 ---
 
-**Note**: This is a clean architecture implementation focused on production quality and maintainability. For questions or support, please open an issue or contact the maintainers.
+## 📋 Table of Contents
+
+- [🎯 Philosophy & Goals](#-philosophy--goals)
+- [✨ Features](#-features)
+- [🛠️ Technology Stack](#-technology-stack)
+- [📁 Project Structure](#-project-structure)
+- [🚀 Getting Started](#-getting-started)
+- [📚 Usage](#-usage)
+- [🧪 Testing](#-testing)
+- [🤝 Contributing](#-contributing)
+- [📄 License](#-license)
+- [🕰️ Legacy Section](#-legacy-section)
+
+---
+
+## 🎯 Philosophy & Goals
+
+This project is not just another MCP server. It's a **teaching tool** and **reference implementation** designed to demonstrate best practices in software development.
+
+### Core Principles:
+- **🎨 Clean Architecture**: Beautiful, maintainable code structure
+- **📚 Educational Value**: Learn by example how to build quality software
+- **⚡ Production Ready**: Not a prototype, but a real-world solution
+- **🔍 Transparency**: Every decision is documented and explained
+
+### What Makes This Project Special:
+- **Exemplary Quality**: A "good, solid, quality project" that others can learn from
+- **Real-World Ready**: Designed for actual production use, not just demos
+- **Community Focused**: Built to be understood, extended, and improved by others
+- **Best Practices**: Demonstrates modern Python development standards
+
+---
+
+## ✨ Features
+
+### 🧠 Memory Management
+- **Semantic Search**: BGE-M3 embeddings for intelligent memory retrieval
+- **Multi-language Support**: Automatic language detection and filtering
+- **Tag System**: Organize memories with flexible tagging
+- **Metadata Rich**: Store context with every memory
+
+### 💬 Conversation History
+- **Full Context Tracking**: Never lose important conversation details
+- **Hybrid Retrieval**: Combines recent and semantically relevant messages
+- **Smart Summarization**: MVP concatenation with future LLM support
+- **Session Management**: Organized by user and session IDs
+
+### 🔍 Advanced Search
+- **Natural Language Queries**: Search like you think
+- **Time-based Filtering**: "Show me memories from last week"
+- **Faceted Search**: Drill down by tags, language, metadata
+- **Search Analytics**: Understand what users are looking for
+
+### 🔄 Import/Export
+- **Full Backup Support**: Export entire collections to JSON
+- **Selective Export**: Export by user, session, or criteria
+- **Migration Ready**: Import from other systems
+- **Data Portability**: Your data, your control
+
+---
+
+## 🛠️ Technology Stack
+
+### Core Technologies:
+- **🐍 Python 3.11+**: Modern Python with type hints
+- **🔗 Langgraph**: For building stateful agents
+- **🎯 Qdrant**: High-performance vector database
+- **🤖 OpenAI**: For embeddings and future LLM features
+- **🔌 MCP (Model Context Protocol)**: Standardized AI tool interface
+
+### Key Libraries:
+- **FastMCP**: MCP server implementation
+- **BGE-M3**: State-of-the-art multilingual embeddings
+- **Pydantic**: Data validation and settings
+- **HTTPX**: Modern async HTTP client
+- **Rich**: Beautiful terminal output
+
+---
+
+## 📁 Project Structure
+
+```
+langraph-qdrant-memory-agent/
+├── 📋 metaplan/                    # Project planning and progress
+│   ├── memory-agent-metaplan.md   # Detailed development plan
+│   └── memory-agent-metaplan-log.md # Progress tracking
+├── 🧠 unified_memory/             # Core memory functionality
+│   ├── __init__.py
+│   ├── core.py                    # Main memory operations
+│   ├── search.py                  # Advanced search features
+│   ├── conversation.py            # Conversation management
+│   ├── language.py                # Multi-language support
+│   └── import_export.py           # Data portability
+├── 🔗 unified_checkpointer/       # Langgraph integration
+│   ├── __init__.py
+│   ├── checkpointer.py            # State persistence
+│   ├── store.py                   # Key-value storage
+│   └── models.py                  # Data models
+├── 🧪 tests/                      # Comprehensive test suite
+│   ├── test_memory.py
+│   ├── test_search.py
+│   ├── test_conversation.py
+│   └── test_checkpointer.py
+├── 📚 docs/                       # Documentation
+│   ├── architecture.md
+│   ├── api.md
+│   └── examples.md
+├── 🔧 scripts/                    # Utility scripts
+│   ├── setup_qdrant.py
+│   └── migrate_data.py
+├── server.py                      # MCP server entry point
+├── requirements.txt               # Python dependencies
+├── pyproject.toml                # Project configuration
+└── README.md                     # You are here!
+```
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+1. **Python 3.11+**
+   ```bash
+   python --version  # Should show 3.11 or higher
+   ```
+
+2. **Qdrant** (Choose one):
+   - Docker (Recommended):
+     ```bash
+     docker run -p 6333:6333 qdrant/qdrant
+     ```
+   - Or Qdrant Cloud: [Sign up here](https://cloud.qdrant.io/)
+
+3. **OpenAI API Key** (for embeddings):
+   ```bash
+   export OPENAI_API_KEY="your-api-key-here"
+   ```
+
+### Installation
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/Dimaris-nsk/langraph-qdrant-memory-agent.git
+   cd langraph-qdrant-memory-agent
+   ```
+
+2. **Create virtual environment**:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+3. **Install dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Configure environment**:
+   ```bash
+   cp .env.example .env
+   # Edit .env with your settings
+   ```
+
+5. **Initialize Qdrant**:
+   ```bash
+   python scripts/setup_qdrant.py
+   ```
+
+### Running the Server
+
+```bash
+# Standard mode
+python server.py
+
+# Debug mode with rich output
+python server.py --debug
+
+# Custom port
+python server.py --port 8080
+```
+
+---
+
+## 📚 Usage
+
+### Basic Memory Operations
+
+```python
+# Store a memory
+store_memory({
+    "content": "Important meeting notes from project kickoff",
+    "tags": ["meeting", "project-x", "important"],
+    "metadata": {"date": "2025-01-29", "attendees": ["Alice", "Bob"]}
+})
+
+# Retrieve memories
+results = retrieve_memory({
+    "query": "project kickoff meeting",
+    "tags": ["important"],
+    "limit": 5
+})
+
+# Search by tags
+memories = search_by_tags({
+    "tags": ["meeting", "important"]
+})
+```
+
+### Conversation Management
+
+```python
+# Store conversation turn
+store_conversation_turn({
+    "session_id": "session-123",
+    "user_id": "user-456",
+    "human_message": "Tell me about the weather",
+    "ai_message": "I'll help you with weather information..."
+})
+
+# Get conversation summary
+summary = get_conversation_summary({
+    "session_id": "session-123",
+    "user_id": "user-456",
+    "max_tokens": 2000
+})
+
+# Search conversation history
+results = search_conversation_history({
+    "session_id": "session-123",
+    "user_id": "user-456",
+    "semantic_query": "weather discussion",
+    "k": 5
+})
+```
+
+### Advanced Search
+
+```python
+# Natural language search
+results = advanced_search({
+    "query": "meetings from last week about project X",
+    "include_facets": True
+})
+
+# Parse natural query
+parsed = parse_natural_query({
+    "query": "show me important Python code from yesterday"
+})
+# Returns: {"tags": ["important", "python"], "time_range": "yesterday", ...}
+```
+
+### Import/Export
+
+```python
+# Export collection
+export_collection({
+    "output_path": "/backup/memory_2025-01-29.json",
+    "with_vectors": True
+})
+
+# Import collection
+import_collection({
+    "input_path": "/backup/memory_2025-01-29.json",
+    "merge_payload": True,
+    "skip_existing": True
+})
+```
+
+---
+
+## 🧪 Testing
+
+### Running Tests
+
+```bash
+# All tests
+pytest
+
+# With coverage
+pytest --cov=unified_memory --cov=unified_checkpointer
+
+# Specific test file
+pytest tests/test_memory.py
+
+# With verbose output
+pytest -v
+```
+
+### Test Categories
+
+- **Unit Tests**: Test individual components
+- **Integration Tests**: Test component interactions
+- **E2E Tests**: Full workflow testing
+- **Performance Tests**: Ensure scalability
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! This project is designed to be a learning experience for everyone.
+
+### How to Contribute
+
+1. **Fork the repository**
+2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
+3. **Commit your changes**: `git commit -m 'Add amazing feature'`
+4. **Push to the branch**: `git push origin feature/amazing-feature`
+5. **Open a Pull Request**
+
+### Contribution Guidelines
+
+- **Code Quality**: Follow PEP 8 and use type hints
+- **Tests**: Add tests for new features
+- **Documentation**: Update docs for changes
+- **Commits**: Use conventional commits format
+
+### Development Setup
+
+```bash
+# Install dev dependencies
+pip install -r requirements-dev.txt
+
+# Run code formatter
+black .
+
+# Run linter
+flake8
+
+# Run type checker
+mypy .
+```
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🕰️ Legacy Section
+
+### Project History
+
+This project evolved from `langchain-memory-integration-enhanced`, originally created as a test task to showcase Langchain skills. What started as a demonstration became a full-fledged production system.
+
+### Evolution Timeline:
+1. **Initial Phase**: Basic Langchain memory integration
+2. **Enhancement Phase**: Added Qdrant vector storage
+3. **Production Phase**: Rebuilt with Langgraph for stateful agents
+4. **Current Phase**: MCP server with comprehensive features
+
+### Original Vision
+
+From the creator:
+> "Я хочу донести до людей что правильно выстроенный воркфлоу когда все работает слаженно и создается действительно правильный качественный код по настоящему качественное ПО..."
+
+Translation: "I want to show people that a properly structured workflow, where everything works harmoniously, creates truly correct, quality code and genuinely quality software..."
+
+This vision drives every decision in this project.
+
+### Lessons Learned
+
+1. **Start with solid architecture** - It pays off in the long run
+2. **Document as you go** - Future you will thank present you
+3. **Test everything** - Quality requires verification
+4. **Think production from day one** - Prototypes often become products
+
+---
+
+## 🎯 Why This Project Matters
+
+In a world of quick demos and throwaway code, this project stands as an example of what software development should be:
+
+- **Thoughtful**: Every line of code has a purpose
+- **Maintainable**: Easy to understand and extend
+- **Educational**: Learn best practices by example
+- **Production-Ready**: Not just a demo, but a real tool
+
+Whether you're learning to code or teaching others, this project demonstrates that quality matters, process matters, and doing things right the first time is always worth it.
+
+---
+
+*Built with ❤️ and attention to quality*
+
+*"Quality is not an act, it is a habit." - Aristotle*
